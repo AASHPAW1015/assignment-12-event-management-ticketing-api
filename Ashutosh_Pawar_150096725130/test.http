@@ -1,0 +1,129 @@
+### Health check
+GET http://localhost:5000/
+
+### Register an organizer
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Riya Organizer",
+  "email": "riya@events.com",
+  "password": "secret123",
+  "role": "organizer"
+}
+
+### Register an attendee
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Kunal Sharma",
+  "email": "kunal@gmail.com",
+  "password": "secret123",
+  "role": "attendee"
+}
+
+### Login as organizer (copy the token into @organizerToken)
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "riya@events.com",
+  "password": "secret123"
+}
+
+### Login as attendee (copy the token into @attendeeToken)
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "kunal@gmail.com",
+  "password": "secret123"
+}
+
+@organizerToken = PASTE_ORGANIZER_TOKEN
+@attendeeToken = PASTE_ATTENDEE_TOKEN
+@eventId = PASTE_EVENT_ID
+@ticketId = PASTE_TICKET_ID
+
+### Profile
+GET http://localhost:5000/api/auth/profile
+Authorization: Bearer {{attendeeToken}}
+
+### Create an event with only 5 seats (organizer)
+POST http://localhost:5000/api/events
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "title": "Global Cloud & AI Summit 2026",
+  "description": "Annual flagship backend conference",
+  "category": "Technology",
+  "eventDate": "2026-12-15T09:00:00Z",
+  "venue": "Bandra Kurla Complex, Mumbai",
+  "city": "Mumbai",
+  "ticketPrice": 1499,
+  "totalCapacity": 5
+}
+
+### Browse upcoming events (public)
+GET http://localhost:5000/api/events?category=Technology&city=Mumbai
+
+### Browse completed events
+GET http://localhost:5000/api/events?status=completed
+
+### Event details + live remaining tickets
+GET http://localhost:5000/api/events/{{eventId}}
+
+### Update event (organizer, owner only)
+PUT http://localhost:5000/api/events/{{eventId}}
+Authorization: Bearer {{organizerToken}}
+Content-Type: application/json
+
+{
+  "ticketPrice": 1299,
+  "totalCapacity": 6
+}
+
+### Attendee tries to create an event -> 403
+POST http://localhost:5000/api/events
+Authorization: Bearer {{attendeeToken}}
+Content-Type: application/json
+
+{ "title": "Nope" }
+
+### Book 2 tickets (attendee) -- send 11 times in a minute to see 429
+POST http://localhost:5000/api/tickets/book
+Authorization: Bearer {{attendeeToken}}
+Content-Type: application/json
+
+{
+  "eventId": "{{eventId}}",
+  "quantity": 2
+}
+
+### Book more than what is left -> 409
+POST http://localhost:5000/api/tickets/book
+Authorization: Bearer {{attendeeToken}}
+Content-Type: application/json
+
+{
+  "eventId": "{{eventId}}",
+  "quantity": 10
+}
+
+### My tickets
+GET http://localhost:5000/api/tickets/my-tickets
+Authorization: Bearer {{attendeeToken}}
+
+### Cancel a ticket (seats go back to the event)
+POST http://localhost:5000/api/tickets/{{ticketId}}/cancel
+Authorization: Bearer {{attendeeToken}}
+
+### Attendee list (organizer, owner only)
+GET http://localhost:5000/api/events/{{eventId}}/attendees
+Authorization: Bearer {{organizerToken}}
+
+### Cancel + delete event (organizer, owner only)
+DELETE http://localhost:5000/api/events/{{eventId}}
+Authorization: Bearer {{organizerToken}}
