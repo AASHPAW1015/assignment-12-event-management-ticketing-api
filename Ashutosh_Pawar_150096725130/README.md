@@ -12,6 +12,18 @@ rush of buyers can never push `availableTickets` below 0. The booking route is
 rate limited to 10 requests per minute to slow down scalper bots, and the whole
 API is documented with Swagger UI.
 
+## Live demo
+
+- API: https://assignment-12-event-management-ticketing-xrd6.onrender.com
+- Swagger UI: https://assignment-12-event-management-ticketing-xrd6.onrender.com/api-docs
+
+Runs as one Render web service on the free tier, so the first request after a
+period of inactivity can take up to a minute. Deployed with root directory
+`Ashutosh_Pawar_150096725130`, build `npm install`, start `npm start`, and
+`JWT_SECRET` plus `FIREBASE_SERVICE_ACCOUNT` (the whole service account JSON)
+set in the Render environment. `trust proxy` is on so the rate limiter sees
+each client's real IP behind Render's proxy.
+
 ## Tech stack
 
 - Node.js, Express 5
